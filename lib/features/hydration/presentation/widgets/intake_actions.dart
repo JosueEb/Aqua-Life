@@ -58,7 +58,7 @@ abstract final class IntakeActions {
     final base = '+${VolumeFormat.format(r.intake.amountMl, unit)} registrados';
     final rewards = [
       if (r.xpEarned > 0) '+${r.xpEarned} XP',
-      if (r.coinsEarned > 0) '+${r.coinsEarned} monedas',
+      if (r.coinsEarned > 0) '+${r.coinsEarned} moneda${r.coinsEarned == 1 ? '' : 's'}',
     ].join(' · ');
     final headline = r.unlockedAchievements.isNotEmpty
         ? '¡Logro desbloqueado: ${r.unlockedAchievements.join(', ')}!'

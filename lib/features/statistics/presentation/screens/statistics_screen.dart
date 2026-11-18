@@ -128,7 +128,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                           icon: Icons.check_circle,
                           color: AppColors.success,
                           label: 'Metas cumplidas',
-                          value: '${summary.completedDays}/${elapsed.length}',
+                          // Solo cuentan los días con meta vigente (no los anteriores al perfil).
+                          value: '${summary.completedDays}/${elapsed.where((d) => d.goalMl > 0).length}',
                         ),
                       ),
                     ],
@@ -316,7 +317,8 @@ class _ConsumptionChart extends StatelessWidget {
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 48,
-              interval: maxY / 4,
+              // Marcas redondas (cada 0,5 L o 1 L) en lugar de fracciones del máximo.
+              interval: maxY <= 3000 ? 500 : 1000,
               getTitlesWidget: (value, meta) => value == 0 || value >= meta.max
                   ? const SizedBox.shrink()
                   : SideTitleWidget(

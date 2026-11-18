@@ -31,7 +31,7 @@ class MissionsScreen extends ConsumerWidget {
       final grant = await ref.read(missionsRepositoryProvider).claim(userId, m.def.id, ref.read(clockProvider)());
       if (grant != null) {
         ref.read(petMomentProvider.notifier).trigger(PetMood.happy);
-        messenger.showSnackBar(SnackBar(content: Text('¡${m.def.title}! +${grant.xp} XP · +${grant.coins} monedas')));
+        messenger.showSnackBar(SnackBar(content: Text('¡${m.def.title}! +${grant.xp} XP · +${grant.coins} moneda${grant.coins == 1 ? '' : 's'}')));
       }
     } on ValidationFailure catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));

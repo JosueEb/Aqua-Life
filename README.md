@@ -5,6 +5,12 @@ Especificación completa: [AquaLife_Requerimientos_y_Especificacion.pdf](AquaLif
 
 - Identificador: `dev.josueeb.aqualife`
 - Stack: Flutter · Riverpod · GoRouter · Drift (SQLite) · flutter_local_notifications · fl_chart · Lottie
+- Requiere Flutter ≥ 3.47 (Dart ^3.14); probado con Flutter 3.50
+- Versión: 1.0.0+1 · Android listo para firmar y publicar; iOS pendiente de compilar (ver abajo)
+
+| Inicio | Misiones | Progreso | Aqua |
+|---|---|---|---|
+| ![Inicio](docs/screenshots/android/02_inicio.png) | ![Misiones](docs/screenshots/android/03_misiones.png) | ![Progreso](docs/screenshots/android/04_progreso.png) | ![Aqua](docs/screenshots/android/07_mascota.png) |
 
 ## Puesta en marcha
 
@@ -14,6 +20,13 @@ dart run build_runner build      # genera el código de Drift (*.g.dart)
 flutter test
 flutter run
 ```
+
+## Publicación
+
+Guía completa en [docs/PUBLICACION.md](docs/PUBLICACION.md): firma (`android/key.properties`),
+`flutter build appbundle` / `flutter build ipa`, checklist de pruebas en dispositivos reales,
+textos de las fichas y respuestas de privacidad. Capturas de tienda (1080×1920) en
+[docs/screenshots/android/](docs/screenshots/android/).
 
 ## Estructura
 
@@ -74,4 +87,13 @@ Las recompensas se registran en el ledger `reward_transactions` con clave única
 - [x] 7. Mascota (estados de ánimo animados en código, 12 accesorios equipables por categoría)
 - [x] 8. Misiones diarias/semanales, cofres, tienda cosmética e inventario
 - [x] Exportación e importación de respaldo JSON
-- [ ] 9. QA y publicación
+- [x] 9. QA y publicación: ícono de la app, firma de release, 55 pruebas (incluye recorrido de las 13 pantallas
+  y programación de recordatorios), APK de release verificado, capturas de tienda y guía de publicación
+
+### Pendiente antes de las tiendas
+
+- Pruebas manuales en un Android y un iPhone reales (checklist en `docs/PUBLICACION.md`).
+- iOS: Xcode 26.5 necesita la plataforma iOS 26.5 (Xcode › Settings › Components) para compilar;
+  después, capturas de iPhone 6,9" y firma con tu equipo de Apple.
+- Ícono de 1024 px nítido: el actual se escaló desde 512 px.
+- Publicar la política de privacidad en una URL y crear las cuentas de desarrollador.
