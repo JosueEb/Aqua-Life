@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aqua · accesorios</title>
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; background: #F5FAFD; color: #176A9A; }
+  h1 { text-align: center; margin: 16px 0 4px; font-size: 22px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 10px; }
+  figure { margin: 0; background: #fff; border-radius: 16px; padding: 8px; text-align: center; box-shadow: 0 2px 8px #176a9a22; }
+  .stack { position: relative; width: 150px; height: 150px; }
+  .stack img { position: absolute; inset: 0; width: 150px; height: 150px; }
+  figcaption { font-size: 12px; font-weight: 600; margin-top: 4px; }
+</style>
+</head>
+<body>
+<h1>Accesorios sobre Aqua</h1>
+<div class="grid" id="g"></div>
+<script>
+  const items = [
+    ['hat_cap',2],['hat_flower',1],['hat_beanie',3],['hat_party',4],
+    ['glasses_round',2],['glasses_sun',5],['glasses_star',1],
+    ['neck_bow',2],['neck_scarf',3],['bg_ocean',2],['bg_rain',4],['fx_bubbles',5]
+  ];
+  const g = document.getElementById('g');
+  for (const [id, stage] of items) {
+    const bg = id.startsWith('bg_');
+    const hat = id.startsWith('hat_') && stage >= 3;
+    const pet = `../../assets/images/mascot/stage_${stage}/aqua_stage_${stage}${hat ? '_bare' : ''}.svg`;
+    const acc = `../../assets/images/accessories/${id}.svg`;
+    const scale = stage === 1 ? 'transform:scale(.86);transform-origin:50% 93%;' : '';
+    g.insertAdjacentHTML('beforeend', `<figure><div class="stack">
+      ${bg ? `<img src="${acc}">` : ''}<img src="${pet}">
+      ${bg ? '' : `<img src="${acc}" style="${scale}">`}</div><figcaption>${id} · etapa ${stage}</figcaption></figure>`);
+  }
+</script>
+</body>
+</html>
