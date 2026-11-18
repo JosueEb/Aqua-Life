@@ -7,14 +7,15 @@ import '../../features/goals/presentation/goals_screen.dart';
 import '../../features/hydration/presentation/screens/add_intake_screen.dart';
 import '../../features/hydration/presentation/screens/history_screen.dart';
 import '../../features/hydration/presentation/screens/home_screen.dart';
+import '../../features/missions/presentation/missions_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/pet/presentation/screens/pet_screen.dart';
 import '../../features/profile/presentation/providers/session_providers.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/reminders/presentation/reminders_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/shop/presentation/shop_screens.dart';
 import '../../features/statistics/presentation/screens/statistics_screen.dart';
-import '../../shared/widgets/coming_soon_screen.dart';
 import 'main_shell.dart';
 
 abstract final class AppRoutes {
@@ -42,12 +43,6 @@ final routerProvider = Provider<GoRouter>((ref) {
   final onboardingDone = ValueNotifier<bool>(ref.read(sessionProvider).onboardingCompleted);
   ref.listen(sessionProvider, (_, s) => onboardingDone.value = s.onboardingCompleted);
   ref.onDispose(onboardingDone.dispose);
-
-  GoRoute soon(String path, String title, String description, IconData icon) => GoRoute(
-        path: path,
-        parentNavigatorKey: _rootKey,
-        builder: (_, _) => ComingSoonScreen(title: title, description: description, icon: icon),
-      );
 
   final router = GoRouter(
     navigatorKey: _rootKey,
@@ -80,9 +75,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: AppRoutes.goals, parentNavigatorKey: _rootKey, builder: (_, _) => const GoalsScreen()),
       GoRoute(path: AppRoutes.history, parentNavigatorKey: _rootKey, builder: (_, _) => const HistoryScreen()),
       GoRoute(path: AppRoutes.reminders, parentNavigatorKey: _rootKey, builder: (_, _) => const RemindersScreen()),
-      soon(AppRoutes.missions, 'Misiones', 'Misiones diarias y semanales con recompensas.', Icons.flag_circle),
-      soon(AppRoutes.shop, 'Tienda', 'Accesorios cosméticos para Aqua.', Icons.storefront),
-      soon(AppRoutes.inventory, 'Inventario', 'Tus artículos y accesorios.', Icons.inventory_2),
+      GoRoute(path: AppRoutes.missions, parentNavigatorKey: _rootKey, builder: (_, _) => const MissionsScreen()),
+      GoRoute(path: AppRoutes.shop, parentNavigatorKey: _rootKey, builder: (_, _) => const ShopScreen()),
+      GoRoute(path: AppRoutes.inventory, parentNavigatorKey: _rootKey, builder: (_, _) => const InventoryScreen()),
       GoRoute(path: AppRoutes.settings, parentNavigatorKey: _rootKey, builder: (_, _) => const SettingsScreen()),
       GoRoute(
         path: AppRoutes.notificationSettings,

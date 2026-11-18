@@ -8,7 +8,17 @@ import '../tables/gamification_tables.dart';
 
 part 'gamification_dao.g.dart';
 
-@DriftAccessor(tables: [GamificationProfiles, RewardTransactions, Pets, Achievements, UserAchievements])
+@DriftAccessor(tables: [
+  GamificationProfiles,
+  RewardTransactions,
+  Pets,
+  Achievements,
+  UserAchievements,
+  Missions,
+  UserMissions,
+  ShopItems,
+  InventoryItems,
+])
 class GamificationDao extends DatabaseAccessor<AppDatabase> with _$GamificationDaoMixin {
   GamificationDao(super.db);
 
@@ -122,4 +132,66 @@ class GamificationDao extends DatabaseAccessor<AppDatabase> with _$GamificationD
           for (final r in rows) (r.readTable(achievements), r.readTableOrNull(userAchievements)?.unlockedAt),
         ]);
   }
+
+  // ---------- Monedas y tienda ----------
+  /// Descuenta monedas registrando un movimiento negativo en el ledger.
+  /// Debe llamarse dentro de una transacción tras validar el saldo.
+  Future<void> spendCoins(String userId, int amount, String source, String referenceId, String localDate, DateTime now) async {
+    final profile = await getProfile(userId);
+    await into(rewardTransactions).insert(RewardTransactionsCompanion.insert(
+      userId: userId,
+      type: RewardType.coins,
+      amount: -amount,
+      source: source,
+      referenceId: referenceId,
+      localDate: localDate,
+      createdAt: now,
+    ));
+    await (update(gamificationProfiles)..where((p) => p.userId.equals(userId)))
+        .write(GamificationProfilesCompanion(coins: Value(profile.coins - amount)));
+  }
+
+  Future<List<ShopItemRow>> allShopItems() =>
+      (select(shopItems)..orderBy([(s) => OrderingTerm.asc(s.unlockLevel), (s) => OrderingTerm.asc(s.priceCoins)])).get();
+
+  Stream<List<ShopItemRow>> watchShopItems() =>
+      (select(shopItems)..orderBy([(s) => OrderingTerm.asc(s.unlockLevel), (s) => OrderingTerm.asc(s.priceCoins)])).watch();
+
+  Future<ShopItemRow?> findShopItem(String id) => (select(shopItems)..where((s) => s.id.equals(id))).getSingleOrNull();
+
+  Stream<List<InventoryItemRow>> watchInventory(String userId) =>
+      (select(inventoryItems)..where((i) => i.userId.equals(userId))..orderBy([(i) => OrderingTerm.desc(i.acquiredAt)])).watch();
+
+  Future<bool> ownsItem(String userId, String itemId) async =>
+      await (select(inventoryItems)..where((i) => i.userId.equals(userId) & i.itemId.equals(itemId))).getSingleOrNull() !=
+      null;
+
+  Future<void> addToInventory(String userId, String itemId, DateTime now) =>
+      into(inventoryItems).insert(InventoryItemsCompanion.insert(userId: userId, itemId: itemId, acquiredAt: now));
+
+  Future<void> setEquipped(String userId, String? encoded) =>
+      (update(pets)..where((p) => p.userId.equals(userId))).write(PetsCompanion(equippedAccessory: Value(encoded)));
+
+  // ---------- Misiones ----------
+  Future<List<MissionRow>> allMissions() => select(missions).get();
+
+  Future<List<UserMissionRow>> userMissionsSince(String userId, String fromPeriodStart) => (select(userMissions)
+        ..where((u) => u.userId.equals(userId) & u.periodStart.isBiggerOrEqualValue(fromPeriodStart)))
+      .get();
+
+  Future<void> markMissionClaimed(String userId, String missionId, String periodStart, int progress) =>
+      into(userMissions).insert(
+        UserMissionsCompanion.insert(
+          userId: userId,
+          missionId: missionId,
+          periodStart: periodStart,
+          progress: Value(progress),
+          completed: const Value(true),
+          claimed: const Value(true),
+        ),
+        onConflict: DoUpdate(
+          (_) => UserMissionsCompanion(progress: Value(progress), completed: const Value(true), claimed: const Value(true)),
+          target: [userMissions.userId, userMissions.missionId, userMissions.periodStart],
+        ),
+      );
 }

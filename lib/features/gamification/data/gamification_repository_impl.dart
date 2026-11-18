@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../../../core/database/app_database.dart';
+import '../../pet/domain/pet_accessories.dart';
 import '../../pet/domain/pet_evolution.dart';
 import '../domain/gamification_status.dart';
 
@@ -27,6 +28,7 @@ class GamificationRepositoryImpl implements GamificationRepository {
         currentStreak: p.currentStreak,
         longestStreak: p.longestStreak,
         petStage: PetStage.fromNumber(pet!.evolutionStage),
+        equipped: EquippedAccessories.decode(pet!.equippedAccessory),
       ));
     }
 

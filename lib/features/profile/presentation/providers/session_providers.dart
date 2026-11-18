@@ -38,6 +38,14 @@ class SessionNotifier extends Notifier<Session> {
     await prefs.setBool(PrefKeys.onboardingCompleted, true);
     state = Session(userId: userId, onboardingCompleted: true);
   }
+
+  /// Activa un usuario ya existente en la base (p. ej. tras importar un respaldo).
+  Future<void> adopt(String userId) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setString(PrefKeys.currentUserId, userId);
+    await prefs.setBool(PrefKeys.onboardingCompleted, true);
+    state = Session(userId: userId, onboardingCompleted: true);
+  }
 }
 
 final sessionProvider = NotifierProvider<SessionNotifier, Session>(SessionNotifier.new);

@@ -19,7 +19,26 @@ enum PetStage {
   PetStage? get next => number < values.length ? values[number] : null;
 }
 
-enum PetMood { idle, happy, drinking, celebrating, levelUp, sleeping }
+enum PetMood {
+  idle('Tranquila'),
+  happy('Feliz'),
+  drinking('Bebiendo'),
+  celebrating('¡Celebrando!'),
+  levelUp('¡Evolucionó!'),
+  sleeping('Durmiendo');
+
+  const PetMood(this.displayName);
+  final String displayName;
+}
+
+/// Estado de ánimo de reposo según la hora y el avance del día. Los estados
+/// momentáneos (bebiendo, celebrando, evolución) los dispara la interfaz.
+abstract final class PetMoodResolver {
+  static PetMood resting({required DateTime now, required bool goalCompleted}) {
+    if (now.hour >= 22 || now.hour < 7) return PetMood.sleeping;
+    return goalCompleted ? PetMood.happy : PetMood.idle;
+  }
+}
 
 abstract final class PetEvolution {
   static PetStage stageForXp(int totalXp) {

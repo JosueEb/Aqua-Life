@@ -6,6 +6,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/gamification_rules.dart';
 import '../../../core/utils/volume_format.dart';
+import '../../backup/presentation/backup_actions.dart';
 import '../../hydration/presentation/providers/hydration_providers.dart';
 import '../../profile/presentation/providers/session_providers.dart';
 
@@ -82,6 +83,26 @@ class SettingsScreen extends ConsumerWidget {
                 title: const Text('Meta diaria'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.push('/goals'),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 24),
+          Text('Tus datos', style: t.titleMedium),
+          const SizedBox(height: 4),
+          const Text('AquaLife no usa la nube. Guarda un respaldo para no perder tu progreso si cambias de teléfono.'),
+          const SizedBox(height: 10),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: Column(children: [
+              ListTile(
+                leading: const Icon(Icons.upload_file, color: AppColors.primary),
+                title: const Text('Exportar respaldo (JSON)'),
+                onTap: () => BackupActions.export(context, ref),
+              ),
+              ListTile(
+                leading: const Icon(Icons.download, color: AppColors.primary),
+                title: const Text('Importar respaldo'),
+                onTap: () => BackupActions.import(context, ref),
               ),
             ]),
           ),

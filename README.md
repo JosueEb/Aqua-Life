@@ -24,7 +24,7 @@ lib/
   features/   una carpeta por funcionalidad con data / domain / presentation
   shared/     widgets reutilizables
 assets/images/mascot/stage_1..5/   ilustraciones de Aqua
-tool/mascot/                       generador de los SVG de Aqua y vista previa
+tool/mascot/                       generadores de los SVG de Aqua y sus accesorios, con vistas previas
 test/{unit,integration,widget}/
 ```
 
@@ -51,6 +51,10 @@ Las recompensas se registran en el ledger `reward_transactions` con clave única
 - Solo se pueden registrar o editar consumos de los últimos 7 días.
 - XP y monedas solo se otorgan por cambios en el día de hoy; los días pasados cuentan para historial, rachas y logros.
 - La racha se cuenta hasta ayer mientras la meta de hoy no se cumple (no punitiva); la mejor racha nunca baja.
+- Misiones: se calculan desde los registros reales y se reclaman a mano (15 XP diarias, 100 XP semanales).
+- Cofres: el diario se abre al reclamar 3 misiones del día; el semanal, al reclamar todas las semanales.
+  Dan solo monedas, deterministas por fecha (reintentar no cambia el premio).
+- Tienda: solo cosméticos con monedas ganadas en la app; cada compra queda en el ledger como movimiento negativo.
 - Recordatorios: se programan hasta 48 avisos concretos (límite de iOS: 64) y se reprograman al abrir la app,
   al registrar agua y al cambiar la configuración.
 
@@ -67,6 +71,7 @@ Las recompensas se registran en el ledger `reward_transactions` con clave única
 - [x] 4. Recordatorios (horario, intervalo, días, posponer, se pausan al cumplir la meta)
 - [x] 5. Estadísticas (semana/mes, gráfico, calendario de actividad, rachas)
 - [x] 6. Gamificación (rachas, hito de 7 días, logros con monedas)
-- [ ] 7. Mascota (animaciones Lottie, accesorios)
-- [ ] 8. Misiones y tienda
+- [x] 7. Mascota (estados de ánimo animados en código, 12 accesorios equipables por categoría)
+- [x] 8. Misiones diarias/semanales, cofres, tienda cosmética e inventario
+- [x] Exportación e importación de respaldo JSON
 - [ ] 9. QA y publicación

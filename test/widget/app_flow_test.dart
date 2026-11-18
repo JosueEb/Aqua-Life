@@ -16,6 +16,9 @@ void main() {
   });
 
   testWidgets('onboarding como invitado → Inicio → registro rápido', (tester) async {
+    // Aqua respeta "reducir animaciones"; así pumpAndSettle puede terminar.
+    tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     final db = AppDatabase(DatabaseConnection(NativeDatabase.memory(), closeStreamsSynchronously: true));

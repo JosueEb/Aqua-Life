@@ -42,7 +42,7 @@ class ShopItemSeed {
   final int priceCoins;
   final int unlockLevel;
 
-  String get assetPath => 'assets/images/accessories/$id.png';
+  String get assetPath => 'assets/images/accessories/$id.svg';
 }
 
 abstract final class CatalogSeed {

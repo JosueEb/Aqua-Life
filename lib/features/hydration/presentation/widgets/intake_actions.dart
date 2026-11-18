@@ -7,6 +7,9 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/gamification_rules.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/volume_format.dart';
+import '../../../gamification/domain/gamification_status.dart';
+import '../../../pet/domain/pet_evolution.dart';
+import '../../../pet/presentation/pet_mood_providers.dart';
 import '../../../profile/presentation/providers/session_providers.dart';
 import '../../../reminders/presentation/reminder_providers.dart';
 import '../../domain/entities/water_intake.dart';
@@ -20,10 +23,12 @@ abstract final class IntakeActions {
     if (userId == null) return;
     final messenger = ScaffoldMessenger.of(context);
     final unit = ref.read(unitSystemProvider);
+    final before = ref.read(gamificationStatusProvider).value;
     try {
       final result = await ref.read(addWaterIntakeProvider)(userId, amountMl, consumedAt: consumedAt);
       HapticFeedback.lightImpact();
       ref.read(reminderSyncProvider).sync();
+      _reactPet(ref, result, before);
       messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(_message(result, unit))));
@@ -32,6 +37,21 @@ abstract final class IntakeActions {
     } catch (_) {
       messenger.showSnackBar(const SnackBar(content: Text('No se pudo guardar el registro.')));
     }
+  }
+
+  /// Aqua reacciona: evoluciona, celebra la meta/logros o simplemente bebe.
+  static void _reactPet(WidgetRef ref, IntakeResult r, GamificationStatus? before) {
+    final PetMood mood;
+    if (before != null &&
+        PetEvolution.stageForXp(before.totalXp + r.xpEarned).number > before.petStage.number) {
+      mood = PetMood.levelUp;
+    } else if (r.unlockedAchievements.isNotEmpty ||
+        r.rewards.any((g) => g.source == RewardSource.dailyGoal || g.source == RewardSource.streak)) {
+      mood = PetMood.celebrating;
+    } else {
+      mood = PetMood.drinking;
+    }
+    ref.read(petMomentProvider.notifier).trigger(mood);
   }
 
   static String _message(IntakeResult r, UnitSystem unit) {

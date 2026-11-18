@@ -1,3 +1,4 @@
+import '../../pet/domain/pet_accessories.dart';
 import '../../pet/domain/pet_evolution.dart';
 
 class GamificationStatus {
@@ -8,6 +9,7 @@ class GamificationStatus {
     required this.currentStreak,
     required this.longestStreak,
     required this.petStage,
+    this.equipped = EquippedAccessories.none,
   });
 
   static const empty = GamificationStatus(
@@ -19,6 +21,7 @@ class GamificationStatus {
   final int currentStreak;
   final int longestStreak;
   final PetStage petStage;
+  final EquippedAccessories equipped;
 }
 
 abstract interface class GamificationRepository {

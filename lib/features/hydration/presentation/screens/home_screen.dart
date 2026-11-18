@@ -6,8 +6,9 @@ import 'package:material_ui/material_ui.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/volume_format.dart';
 import '../../../gamification/domain/gamification_status.dart';
-import '../../../pet/domain/pet_evolution.dart';
-import '../../../pet/presentation/widgets/aqua_pet_image.dart';
+import '../../../missions/presentation/missions_screen.dart';
+import '../../../pet/presentation/pet_mood_providers.dart';
+import '../../../pet/presentation/widgets/animated_aqua.dart';
 import '../../../profile/presentation/providers/session_providers.dart';
 import '../../domain/entities/water_intake.dart';
 import '../providers/hydration_providers.dart';
@@ -37,12 +38,14 @@ class HomeScreen extends ConsumerWidget {
                 sliver: SliverList.list(children: [
                   _Header(name: profile?.displayName ?? 'Invitado', status: status),
                   const SizedBox(height: 16),
-                  _TodayCard(day: day, unit: unit, stage: status.petStage),
+                  _TodayCard(day: day, unit: unit, status: status),
                   const SizedBox(height: 20),
                   Text('Registro rápido', style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 10),
                   const _QuickAddGrid(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+                  const _MissionsCard(),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(child: Text('Hoy', style: Theme.of(context).textTheme.titleMedium)),
@@ -125,14 +128,14 @@ class _Chip extends StatelessWidget {
   }
 }
 
-class _TodayCard extends StatelessWidget {
-  const _TodayCard({required this.day, required this.unit, required this.stage});
+class _TodayCard extends ConsumerWidget {
+  const _TodayCard({required this.day, required this.unit, required this.status});
   final DailySummary day;
   final UnitSystem unit;
-  final PetStage stage;
+  final GamificationStatus status;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context).textTheme;
     final message = day.completed
         ? '¡Meta cumplida! Aqua está feliz.'
@@ -162,7 +165,17 @@ class _TodayCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Expanded(child: AquaPetImage(stage: stage, size: 130)),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => context.go('/pet'),
+                    child: AnimatedAqua(
+                      stage: status.petStage,
+                      equipped: status.equipped,
+                      mood: ref.watch(petMoodProvider),
+                      size: 130,
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -232,6 +245,38 @@ class _QuickButton extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _MissionsCard extends ConsumerWidget {
+  const _MissionsCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final board = ref.watch(missionBoardProvider).value;
+    if (board == null) return const SizedBox.shrink();
+    final done = board.daily.where((m) => m.completed).length;
+    final claimable = [...board.daily, ...board.weekly].where((m) => m.claimable).length +
+        (board.dailyChest.available ? 1 : 0) +
+        (board.weeklyChest.available ? 1 : 0);
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(18),
+      child: ListTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        leading: const CircleAvatar(
+          backgroundColor: AppColors.primaryLight,
+          child: Icon(Icons.flag_circle, color: AppColors.primary),
+        ),
+        title: Text('Misiones de hoy: $done/${board.daily.length}',
+            style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+        subtitle: Text(claimable > 0 ? '¡Tienes $claimable recompensas por reclamar!' : 'Completa misiones para ganar XP'),
+        trailing: claimable > 0
+            ? Badge(label: Text('$claimable'), backgroundColor: AppColors.reward, textColor: AppColors.textPrimary)
+            : const Icon(Icons.chevron_right),
+        onTap: () => context.push('/missions'),
       ),
     );
   }

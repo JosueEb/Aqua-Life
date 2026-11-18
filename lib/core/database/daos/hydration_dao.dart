@@ -57,6 +57,11 @@ class HydrationDao extends DatabaseAccessor<AppDatabase> with _$HydrationDaoMixi
   Stream<Map<String, int>> watchDailyTotals(String userId, {String? from, String? to}) =>
       _dailyTotals(userId, from: from, to: to).watch().map(Map.fromEntries);
 
+  Future<List<WaterIntakeRow>> intakesBetween(String userId, String from, String to) => (select(waterIntakes)
+        ..where((w) =>
+            w.userId.equals(userId) & w.localDate.isBiggerOrEqualValue(from) & w.localDate.isSmallerOrEqualValue(to)))
+      .get();
+
   Future<int> countIntakes(String userId) async {
     final count = waterIntakes.id.count();
     final row = await (selectOnly(waterIntakes)
